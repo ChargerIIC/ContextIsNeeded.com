@@ -99,8 +99,12 @@ export function QuestionDisplay() {
               <div className="relative space-y-2 sm:space-y-3">
                 {/* Site badge */}
                 <div className="inline-flex items-center rounded-full bg-gradient-to-r from-blue-500/30 to-purple-500/30 px-3 py-1.5 text-xs font-medium text-gray-800 backdrop-blur-sm sm:px-4 sm:py-2 sm:text-sm border border-white/30">
-                  <div className="mr-2 h-1.5 w-1.5 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 sm:h-2 sm:w-2" />
-                  From {currentQuestion.site}
+                  <img
+                    src="/thinking-person-icon.png"
+                    alt="Person thinking"
+                    className="mr-2 h-4 w-4 sm:h-5 sm:w-5 rounded-full object-cover"
+                  />
+                  {currentQuestion.site}
                 </div>
 
                 {/* Question text */}
@@ -116,7 +120,7 @@ export function QuestionDisplay() {
                     className="inline-flex items-center space-x-2 rounded-lg bg-white/50 px-3 py-2 text-xs font-medium text-gray-800 backdrop-blur-sm transition-all hover:bg-white/60 hover:text-gray-900 sm:px-4 sm:text-sm border border-white/30 drop-shadow-sm"
                   >
                     <ExternalLink className="h-3 w-3 sm:h-4 sm:w-4" />
-                    <span>View original question</span>
+                    <span>View original context</span>
                   </a>
                 </div>
               </div>
