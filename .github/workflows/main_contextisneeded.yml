@@ -62,4 +62,10 @@ jobs:
           app-name: 'ContextIsNeeded'
           slot-name: 'Production'
           package: .
+
+      - name: Display deployment info
+        run: |
+          echo "🚀 Deployment completed successfully!"
+          echo "📱 App URL: https://contextisneeded.com"
+          echo "🐳 Image: houseofburt.azurecr.io/dungeon-shopkeep:${{ github.sha }}"
           
