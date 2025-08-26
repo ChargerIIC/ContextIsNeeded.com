@@ -2,9 +2,13 @@
 
 import { useState, useEffect } from "react"
 import { fetchAndParseCSV, type Question } from "@/lib/csv-parser"
+import { fetchQuestionsFromFirestore } from "@/lib/firestore"
 
 const CSV_URL =
   "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/ContextIsNeeded-aRVPvaGSpJEhXQ7RKlXGxn9UxL769l.csv"
+
+// Environment variable to control data source
+const USE_FIREBASE = process.env.NEXT_PUBLIC_USE_FIREBASE === 'true'
 
 // Fallback questions in case CSV fails to load
 const fallbackQuestions: Question[] = [
@@ -36,17 +40,30 @@ export function useQuestions() {
         setIsLoading(true)
         setError(null)
 
-        const csvQuestions = await fetchAndParseCSV(CSV_URL)
-
-        if (csvQuestions.length > 0) {
-          setQuestions(csvQuestions)
+        let loadedQuestions: Question[] = []
+        
+        if (USE_FIREBASE) {
+          try {
+            loadedQuestions = await fetchQuestionsFromFirestore()
+            console.log(`Loaded ${loadedQuestions.length} questions from Firebase`)
+          } catch (firebaseError) {
+            console.warn("Failed to load from Firebase, falling back to CSV:", firebaseError)
+            // Fallback to CSV if Firebase fails
+            loadedQuestions = await fetchAndParseCSV(CSV_URL)
+          }
         } else {
-          console.warn("No questions found in CSV, using fallback data")
+          loadedQuestions = await fetchAndParseCSV(CSV_URL)
+        }
+
+        if (loadedQuestions.length > 0) {
+          setQuestions(loadedQuestions)
+        } else {
+          console.warn("No questions found, using fallback data")
           setQuestions(fallbackQuestions)
         }
       } catch (err) {
-        console.error("Failed to load questions from CSV:", err)
-        setError("Failed to load questions from CSV")
+        console.error("Failed to load questions:", err)
+        setError("Failed to load questions")
         setQuestions(fallbackQuestions)
       } finally {
         setIsLoading(false)
