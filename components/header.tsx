@@ -12,7 +12,11 @@ export function Header() {
     <header className="sticky top-0 z-50 w-full border-b border-white/20 bg-white/10 backdrop-blur-md">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <Link href="/" className="flex items-center space-x-2">
-          <div className="h-8 w-8 rounded-full bg-gradient-to-br from-blue-400 to-purple-500" />
+          <img 
+            src="/thinking-person-icon.png" 
+            alt="Thinking Person Icon" 
+            className="h-8 w-8 rounded-full object-cover" 
+          />
           <span className="text-lg font-bold text-gray-900 sm:text-xl">
             <span className="hidden sm:inline">ContextIsNeeded.com</span>
             <span className="sm:hidden">ContextIsNeeded</span>

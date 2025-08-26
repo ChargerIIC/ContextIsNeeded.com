@@ -56,9 +56,14 @@ export function useQuestions() {
     loadQuestions()
   }, [])
 
+  function getRandomInt(max: number) {
+    const array = new Uint32Array(1)
+    window.crypto.getRandomValues(array)
+    return array[0] % max
+  }
   const getRandomQuestion = (): Question => {
     if (questions.length === 0) return fallbackQuestions[0]
-    return questions[Math.floor(Math.random() * questions.length)]
+    return questions[getRandomInt(questions.length)]
   }
 
   return {

@@ -4,7 +4,6 @@ export function Footer() {
       <div className="container mx-auto px-4 py-8">
         <div className="flex flex-col items-center justify-between space-y-4 md:flex-row md:space-y-0">
           <div className="flex items-center space-x-2">
-            <div className="h-6 w-6 rounded-full bg-gradient-to-br from-blue-400 to-purple-500" />
             <span className="text-sm text-gray-700">ContextIsNeeded.com</span>
           </div>
 
