@@ -15,7 +15,8 @@ jobs:
     permissions:
       contents: read #This is required for actions/checkout
 
-    steps:
+steps:
+      - uses: pnpm/action-setup@v4
       - uses: actions/checkout@v4
 
       - name: Set up Node.js version
@@ -23,7 +24,7 @@ jobs:
         with:
           node-version: '22.x'
 
-      - name: npm install, build, and test
+      - name: pnpm install, build, and test
         run: |
           pnpm install
           pnpm run build --if-present
