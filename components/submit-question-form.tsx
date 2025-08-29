@@ -1,14 +1,16 @@
 "use client"
 
-import type React from "react"
+import React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { CheckCircle, Send, AlertCircle } from "lucide-react"
+import { CheckCircle, Send, AlertCircle, Clock } from "lucide-react"
+import { addQuestionToFirestore, checkRateLimit } from "@/lib/firestore"
+import { useRateLimit } from "@/hooks/use-rate-limit"
 
 interface FormData {
   question: string
@@ -25,6 +27,8 @@ interface FormErrors {
 }
 
 export function SubmitQuestionForm() {
+  const { isAllowed: initialRateLimitAllowed, reason: initialRateLimitReason, retryAfter: initialRetryAfter, recheckRateLimit } = useRateLimit()
+  
   const [formData, setFormData] = useState<FormData>({
     question: "",
     url: "",
@@ -35,6 +39,19 @@ export function SubmitQuestionForm() {
   const [errors, setErrors] = useState<FormErrors>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
+  const [rateLimitInfo, setRateLimitInfo] = useState<{ blocked: boolean; reason?: string; retryAfter?: number } | null>(null)
+
+  // Initialize rate limit info from the hook
+  useEffect(() => {
+    if (!initialRateLimitAllowed) {
+      setRateLimitInfo({
+        blocked: true,
+        reason: initialRateLimitReason,
+        retryAfter: initialRetryAfter
+      })
+    }
+  }, [initialRateLimitAllowed, initialRateLimitReason, initialRetryAfter])
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {}
@@ -75,18 +92,53 @@ export function SubmitQuestionForm() {
     if (!validateForm()) return
 
     setIsSubmitting(true)
+    setSubmitError(null) // Clear any previous errors
+    setRateLimitInfo(null) // Clear any previous rate limit info
 
     try {
-      // Simulate API call - replace with actual submission logic
-      await new Promise((resolve) => setTimeout(resolve, 2000))
-
-      // Here you would typically send the data to your backend
-      console.log("Submitting question:", formData)
+      // Check if Firebase is enabled
+      const useFirebase = process.env.NEXT_PUBLIC_USE_FIREBASE === 'true'
+      
+      if (useFirebase) {
+        // Check rate limits before submitting
+        const rateLimitCheck = await checkRateLimit()
+        if (!rateLimitCheck.allowed) {
+          setRateLimitInfo({
+            blocked: true,
+            reason: rateLimitCheck.reason,
+            retryAfter: rateLimitCheck.retryAfter
+          })
+          return
+        }
+        
+        // Save to Firebase Firestore
+        const questionData = {
+          title: formData.question,
+          url: formData.url,
+          site: formData.site,
+        }
+        
+        const docId = await addQuestionToFirestore(questionData)
+        console.log("Question saved to Firebase with ID:", docId)
+      } else {
+        // Simulate API call for traditional backend
+        await new Promise((resolve) => setTimeout(resolve, 2000))
+        console.log("Submitting question to traditional backend:", formData)
+      }
 
       setIsSubmitted(true)
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error submitting question:", error)
-      // Handle error state here
+      
+      if (error.code === 'rate-limit-exceeded') {
+        setRateLimitInfo({
+          blocked: true,
+          reason: error.message,
+          retryAfter: error.retryAfter
+        })
+      } else {
+        setSubmitError("Failed to submit question. Please wait a moment and try again.")
+      }
     } finally {
       setIsSubmitting(false)
     }
@@ -219,15 +271,71 @@ export function SubmitQuestionForm() {
           <p className="text-xs text-gray-500">We'll only use this to follow up if we need clarification.</p>
         </div>
 
+        {/* Rate limit warning */}
+        {rateLimitInfo?.blocked && (
+          <div className="flex items-start space-x-3 text-sm text-orange-700 p-4 bg-orange-50 rounded-lg border border-orange-200">
+            <Clock className="h-5 w-5 flex-shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <p className="font-medium">Submission Rate Limit Reached</p>
+              <p className="mt-1">{rateLimitInfo.reason}</p>
+              {rateLimitInfo.retryAfter && (
+                <p className="mt-2 text-xs">
+                  You can try again in approximately {rateLimitInfo.retryAfter} minute{rateLimitInfo.retryAfter !== 1 ? 's' : ''}.
+                </p>
+              )}
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="mt-3 text-xs"
+                onClick={async () => {
+                  await recheckRateLimit()
+                  const newCheck = await checkRateLimit()
+                  if (newCheck.allowed) {
+                    setRateLimitInfo(null)
+                  } else {
+                    setRateLimitInfo({
+                      blocked: true,
+                      reason: newCheck.reason,
+                      retryAfter: newCheck.retryAfter
+                    })
+                  }
+                }}
+              >
+                Check Again
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Submit error display */}
+        {submitError && (
+          <div className="flex items-center space-x-1 text-sm text-red-600 p-3 bg-red-50 rounded-md border border-red-200">
+            <AlertCircle className="h-4 w-4 flex-shrink-0" />
+            <span>{submitError}</span>
+          </div>
+        )}
+
         {/* Submit button */}
         <Button
           type="submit"
-          disabled={isSubmitting}
+          disabled={isSubmitting || rateLimitInfo?.blocked}
           className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white py-2.5 text-base font-semibold disabled:opacity-50 sm:py-3 sm:text-lg"
         >
           <div className="flex items-center justify-center space-x-2">
-            <Send className={`h-4 w-4 sm:h-5 sm:w-5 ${isSubmitting ? "animate-pulse" : ""}`} />
-            <span>{isSubmitting ? "Submitting..." : "Submit Question"}</span>
+            {rateLimitInfo?.blocked ? (
+              <Clock className="h-4 w-4 sm:h-5 sm:w-5" />
+            ) : (
+              <Send className={`h-4 w-4 sm:h-5 sm:w-5 ${isSubmitting ? "animate-pulse" : ""}`} />
+            )}
+            <span>
+              {rateLimitInfo?.blocked 
+                ? "Rate Limited" 
+                : isSubmitting 
+                ? "Submitting..." 
+                : "Submit Question"
+              }
+            </span>
           </div>
         </Button>
 

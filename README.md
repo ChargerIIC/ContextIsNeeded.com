@@ -1,30 +1,20 @@
 # Next.js web application
-
-*Automatically synced with your [v0.app](https://v0.app) deployments*
-
-[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/chargeriic-1049s-projects/v0-next-js-web-application)
-[![Built with v0](https://img.shields.io/badge/Built%20with-v0.app-black?style=for-the-badge)](https://v0.app/chat/projects/uGRUVZbiBj1)
+Context is Needed
 
 ## Overview
 
-This repository will stay in sync with your deployed chats on [v0.app](https://v0.app).
-Any changes you make to your deployed app will be automatically pushed to this repository from [v0.app](https://v0.app).
+This is a React.js application backed by Firebase that provides the user with a random StackExchange question, a link to the aforementioned question, and a random picture.
 
 ## Deployment
 
 Your project is live at:
 
-**[https://vercel.com/chargeriic-1049s-projects/v0-next-js-web-application](https://vercel.com/chargeriic-1049s-projects/v0-next-js-web-application)**
+**[https://ContextIsNeeded.com](https://ContextIsNeeded.com)**
 
-## Build your app
 
-Continue building your app on:
+## Acknowledgements
 
-**[https://v0.app/chat/projects/uGRUVZbiBj1](https://v0.app/chat/projects/uGRUVZbiBj1)**
-
-## How It Works
-
-1. Create and modify your project using [v0.app](https://v0.app)
-2. Deploy your chats from the v0 interface
-3. Changes are automatically pushed to this repository
-4. Vercel deploys the latest version from this repository
+* Intial UI by v0.app (Vercel)
+* Data management by Firebase
+* UX rendered in Next.js with React.js 19
+* Zach Scott for a lot of the intial question links
