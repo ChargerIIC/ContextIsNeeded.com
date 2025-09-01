@@ -9,7 +9,8 @@
     "start": "next start",
     "migrate:firebase": "tsx scripts/migrate-to-firebase.ts",
     "migrate:standalone": "tsx scripts/migrate-standalone.ts",
-    "test:firebase": "tsx scripts/test-firebase.ts"
+    "test:firebase": "tsx scripts/test-firebase.ts",
+    "test:ui": "node selenium/ui.test.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
@@ -70,7 +71,9 @@
     "@types/node": "^22",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "chromedriver": "^139.0.3",
     "postcss": "^8.5",
+    "selenium-webdriver": "^4.35.0",
     "tailwindcss": "^4.1.9",
     "tsx": "^4.20.5",
     "tw-animate-css": "1.3.3",
