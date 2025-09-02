@@ -10,7 +10,7 @@ import type { Question } from "@/lib/csv-parser"
 const thoughtImages = ["/thoughtful-person.png", "/focused-laptop-worker.png", "/animated-conversation.png"]
 
 export function QuestionDisplay() {
-  const { questions, isLoading: dataLoading, error, getRandomQuestion, totalQuestions } = useQuestions()
+  const { questions, isLoading: dataLoading, error, getNextQuestion, totalQuestions } = useQuestions()
   const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null)
   const [currentImage, setCurrentImage] = useState(thoughtImages[0])
   const [isChanging, setIsChanging] = useState(false)
@@ -19,27 +19,28 @@ export function QuestionDisplay() {
   const handleNewQuestion = async () => {
     setIsChanging(true)
     setFadeClass("opacity-0")
-
-    // Simulate loading time for smooth transition
-    await new Promise((resolve) => setTimeout(resolve, 300))
-
-    const newQuestion = getRandomQuestion()
-    const randomImage = thoughtImages[Math.floor(Math.random() * thoughtImages.length)]
-
-    setCurrentQuestion(newQuestion)
-    setCurrentImage(randomImage)
-
-    setFadeClass("opacity-100")
-    setIsChanging(false)
+    await new Promise((resolve) => setTimeout(resolve, 250))
+    try {
+      const newQuestion = await getNextQuestion()
+      const randomImage = thoughtImages[Math.floor(Math.random() * thoughtImages.length)]
+      setCurrentQuestion(newQuestion)
+      setCurrentImage(randomImage)
+    } finally {
+      setFadeClass("opacity-100")
+      setIsChanging(false)
+    }
   }
 
   // Initialize with random question when data is loaded
   useEffect(() => {
     if (!dataLoading && questions.length > 0 && !currentQuestion) {
-      const initialQuestion = getRandomQuestion()
-      setCurrentQuestion(initialQuestion)
+      // Use async retrieval path for uniformity
+      (async () => {
+        const initial = await getNextQuestion()
+        setCurrentQuestion(initial)
+      })()
     }
-  }, [dataLoading, questions, currentQuestion, getRandomQuestion])
+  }, [dataLoading, questions, currentQuestion, getNextQuestion])
 
   // Show loading state while data is being fetched
   if (dataLoading) {
@@ -140,7 +141,7 @@ export function QuestionDisplay() {
             <RefreshCw
               className={`h-4 w-4 transition-transform sm:h-5 sm:w-5 ${isChanging ? "animate-spin" : "group-hover:rotate-180"}`}
             />
-            <span>{isChanging ? "Loading..." : "Another Question"}</span>
+            <span>{isChanging ? ("Loading...") : "Another Question"}</span>
           </div>
 
           {/* Shimmer effect */}
@@ -154,7 +155,7 @@ export function QuestionDisplay() {
           Discover questions from across the web that make you go "Wait, what?"
         </p>
         {totalQuestions > 0 && (
-          <p className="text-xs text-gray-400">{totalQuestions} questions loaded from the database</p>
+          <p className="text-xs text-gray-400">{totalQuestions} {'questions loaded'}</p>
         )}
       </div>
     </div>
