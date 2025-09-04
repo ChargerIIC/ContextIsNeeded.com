@@ -26,7 +26,7 @@ jobs:
 
       - name: npm install, build, and test
         run: |
-          npm ci
+          npm install --no-audit --no-fund
           npm run build
 
       - name: Upload artifact for deployment job
@@ -68,4 +68,5 @@ jobs:
           echo "🚀 Deployment completed successfully!"
           echo "📱 App URL: https://contextisneeded.com"
           echo "🐳 Image: houseofburt.azurecr.io/dungeon-shopkeep:${{ github.sha }}"
+
           
