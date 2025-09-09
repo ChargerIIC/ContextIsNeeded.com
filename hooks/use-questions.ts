@@ -49,7 +49,8 @@ export function useQuestions() {
         let loadedQuestions: Question[] = []
         if (USE_FIREBASE) {
           try {
-            loadedQuestions = await fetchQuestionsFromFirestore()
+            const question = await getNextQuestion();
+            loadedQuestions = [question];
             console.log(`Loaded ${loadedQuestions.length} questions from Firebase`)
           } catch (firebaseError) {
             console.warn("Failed to load from Firebase, falling back to CSV:", firebaseError)

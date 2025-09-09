@@ -7,7 +7,7 @@ import { ExternalLink, RefreshCw, AlertCircle } from "lucide-react"
 import { useQuestions } from "@/hooks/use-questions"
 import type { Question } from "@/lib/csv-parser"
 
-const thoughtImages = ["/thoughtful-person.png", "/focused-laptop-worker.png", "/animated-conversation.png"]
+const thoughtImages = ["/thoughtful-person.png", "/focused-laptop-worker.png", "/animated-conversation.png", "/shutterstock-family-phone.jpg"]
 
 export function QuestionDisplay() {
   const { questions, isLoading: dataLoading, error, getNextQuestion, totalQuestions } = useQuestions()
