@@ -47,6 +47,7 @@ jobs:
             .next/standalone/
             .next/static/
             public/
+            app/
             package.json
             package-lock.json
 
@@ -92,4 +93,5 @@ jobs:
           echo "🐳 Image: houseofburt.azurecr.io/dungeon-shopkeep:${{ github.sha }}"
 
           
+
 
