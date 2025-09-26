@@ -48,6 +48,7 @@ jobs:
             .next/static/
             public/
             package.json
+            package-lock.json
 
   deploy:
     runs-on: ubuntu-latest
@@ -91,3 +92,4 @@ jobs:
           echo "🐳 Image: houseofburt.azurecr.io/dungeon-shopkeep:${{ github.sha }}"
 
           
+
