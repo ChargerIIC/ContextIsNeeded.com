@@ -82,7 +82,7 @@ jobs:
           app-name: 'ContextIsNeeded'
           slot-name: 'Production'
           package: .
-          startup-command: 'node .next/standalone/ContextIsNeeded.com/server.js'
+          startup-command: 'node .next/standalone/server.js'
 
       - name: Display deployment info
         run: |
